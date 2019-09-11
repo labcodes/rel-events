@@ -1,6 +1,4 @@
 # TODO
 
-- chaining
-- tests
-- coverall
+- readme
 - docs
