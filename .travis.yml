@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - "current"
 script:
-  - npm run coveralls
+  - npm run test
 before_script:
   - yarn run lint
+after_script:
+  - yarn run coveralls
