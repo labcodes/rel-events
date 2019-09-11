@@ -1,7 +1,7 @@
 {
-  "name": "rel-event",
-  "version": "1.0.0",
-  "description": "Events framework based on redux to decouple our from business logic and make state management easy.",
+  "name": "rel-events",
+  "version": "0.1.0",
+  "description": "The relevant React Events Library. Events framework based on redux to decouple our from business logic and make state management easy.",
   "main": "index.js",
   "scripts": {
     "coveralls": "npm run test && cat ./coverage/lcov.info | coveralls",
@@ -55,7 +55,7 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 100,
+        "branches": 95,
         "functions": 100,
         "lines": 100,
         "statements": 100
