@@ -7,6 +7,8 @@ module.exports = {
     'arrow-body-style': ['error', 'as-needed'],
     'no-param-reassign': 'off',
     'no-underscore-dangle': 'off',
+    'no-prototype-builtins': 'off',
+    'array-callback-return': 'off',
     'no-console': ['error', { allow: ['error'] }],
     'class-methods-use-this': 'off'
   },
