@@ -272,7 +272,69 @@ That means that, whenever the login is successful, `fetchUserData` will be trigg
 
 **One caveat** is that the `event` value is **not** a direct reference to the event that will be listened to. Instead, it's a function that returns the reference. That's needed because we could be using multiple files for multiple events, and, if we do, we can't guarantee that `FetchUserDataRequestEvent` will be loaded into memory before `LoginRequestEvent`. If that happened, the `event` value would be `undefined`.
 
-# TODO
-- shouldDispatch
-- afterDispatch, afterSuccess and afterFailure
-- dispatchEvent
+### `shouldDispatch` optional method - helped by the `getCurrentStateFromEvent` helper
+
+If you're dealing with a situation in which you don't want to dispatch an event based on certain conditions, you should probably implement a `shouldDispatch` method on your event manager.
+
+Imagine a scenario in which you don't want to dispatch an Event if the data is the same it was before. I'll be using the `ChooseDateRangeEvent` (seen above) as an example.
+
+Let's say that you don't want `ChooseDateRangeEvent` to be dispatched if the dates are the same. An example on how we would achieve that would be as follows:
+
+```js
+// on eventManagers.js
+import { getCurrentStateFromEvent } from 'rel-events';
+import { ChooseDateRangeEvent } from './events';
+
+class ChooseDateRangeEventManager {
+
+  //...
+
+  shouldDispatch = (appState, event) => {
+    const currentState = getCurrentStateFromEvent({
+      event: ChooseDateRangeEvent,
+      appState: appState,
+    });
+
+    return (
+      currentState.startDate !== event.startDate
+      && currentState.endDate !== event.endDate
+    );
+  }
+
+  // ...
+
+}
+```
+
+The `shouldDispatch` method receives the whole app state (containing data from all events) and the event that would be dispatched. If `shouldDispatch` returns `true`, the event is dispatched.
+
+Since we don't want to leak the implementation details from the reducer layer, we provide the `getCurrentStateFromEvent` helper. It returns all the relevant data from the Event, so you can compare it to the event that will be dispatched.
+
+And yes, you may use `shouldDispatch` in any way you want. You may want to check a cookie, or data from other events, or localStorage, or the value of a variable, whatever; it only cares that you return a truthy or falsy value. By default, it always returns `true`.
+
+### `afterDispatch`, `afterSuccess` and `afterFailure`
+
+Sometimes, all we want is to run some code after the new state from an event is set. For these cases, you may want to implement an `afterDispatch` method in your manager (for normal Events) or `afterSuccess`/`afterFailure` (for RequestEvents).
+
+```js
+// on eventManagers.js
+import * as Sentry from '@sentry.browser';
+
+class ChooseDateRangeEventManager {
+
+  //...
+
+  afterDispatch = (previousState, newState) => {
+    if (previoustState.isValid && newState.isInvalid) {
+      Sentry.captureMessage('Something went wrong');
+    }
+  }
+
+  // ...
+
+}
+```
+
+## Phew, that was a LOT
+
+Yep. This guide aimed to give you all the rel-evant information you need to know for you to use `rel-events`. If you're interested on more specific info, [take a look at our API docs](https://github.com/labcodes/rel-events/tree/master/docs/README.md), and if you're curious to know how the hell this works, take a look at our [How it works](https://github.com/labcodes/rel-events/tree/master/docs/6-How-it-works.md) guide or [jump into the source code](https://github.com/labcodes/rel-events/tree/master/)!
