@@ -165,7 +165,7 @@ And that's it! We have a lot of other features to discuss, but I'll talk about t
 
 The idea behind this library is to make data management easy and semantic, so we thought it would be best to include a special type of Event for making HTTP requests.
 
-A `RequestEvent` is the very same as the basic `Event`, but instead of having a manager with an `onDispatch` method, we'll need to implement 4 methods: `onRequest`. `onSuccess`, `onFailure` and `call`.
+A `RequestEvent` is the very same as the basic `Event`, but instead of having a manager with only an `onDispatch` method, we'll need to implement 4 methods: `onDispatch`. `onSuccess`, `onFailure` and `call`.
 
 ```js
 // on eventManagers.js
@@ -174,12 +174,14 @@ import { fetchFromApi } from 'rel-events';
 export class LoginRequestEventManager {
   initialState = { isLoading: false, username: 'Anonymous' };
 
-  call = (user) => () => fetchFromApi(
-    '/api/login',
-    { method: 'POST', body: JSON.stringify(user) }
-  )
+  call = (user) => {
+    return () => fetchFromApi(
+      '/api/login',
+      { method: 'POST', body: JSON.stringify(user) }
+    );
+  }
 
-  onRequest = (state, event) => ({
+  onDispatch = (state, event) => ({
     ...state,
     isLoading: true,
     username: this.initialState.username

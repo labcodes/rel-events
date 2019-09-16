@@ -27,7 +27,7 @@ class ChooseDateRangeEventManager {
 
 ### For RequestEvents
 
-For a RequestEvent, the EventManager is required to have an `initialState` and implement 4 methods: `onRequest`, `onSuccess`, `onFailure` and `call`.
+For a RequestEvent, the EventManager is required to have an `initialState` and implement 4 methods: `onDispatch`, `onSuccess`, `onFailure` and `call`.
 
 #### EventManager.call
 
@@ -46,11 +46,11 @@ class LoginEventManager {
 }
 ```
 
-#### EventManager.onRequest, EventManager.onSuccess, EventManager.onFailure
+#### EventManager.onDispatch, EventManager.onSuccess, EventManager.onFailure
 
 These three methods receive the same data (state, event), but are called at different times.
 
-- `onRequest`: called as soon as the request starts. Useful for rendering intermediate states, like loading spinners;
+- `onDispatch`: called as soon as the request starts. Useful for rendering intermediate states, like loading spinners;
 - `onSuccess`: called when the request promise is successfully resolved;
 - `onFailure`: called when the request promise is rejected.
 
@@ -58,7 +58,7 @@ These three methods receive the same data (state, event), but are called at diff
 export class LoginRequestEventManager {
   initialState = { isLoading: false, username: 'Anonymous' };
 
-  onRequest = (state, event) => ({
+  onDispatch = (state, event) => ({
     ...state,
     isLoading: true,
     username: this.initialState.username

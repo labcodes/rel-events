@@ -297,7 +297,7 @@ describe('RequestEvent', () => {
 
   it('createReducers should return object containing reducers', async () => {
     const EventManager = {
-      onRequest: jest.fn(() => 'request dispatched'),
+      onDispatch: jest.fn(() => 'request dispatched'),
       onSuccess: jest.fn(() => 'success dispatched'),
       onFailure: jest.fn(() => 'failure dispatched'),
       call: jest.fn(),
@@ -312,12 +312,12 @@ describe('RequestEvent', () => {
     expect(reducers.testEvent(undefined, { type: 'notThisOne' })).toEqual(
       EventManager.initialState,
     );
-    expect(EventManager.onRequest).not.toBeCalled();
+    expect(EventManager.onDispatch).not.toBeCalled();
     expect(EventManager.onSuccess).not.toBeCalled();
     expect(EventManager.onFailure).not.toBeCalled();
 
     expect(reducers.testEvent({}, { type: 'TEST_EVENT_REQUEST' })).toEqual('request dispatched');
-    expect(EventManager.onRequest).toBeCalledWith({}, { type: 'TEST_EVENT_REQUEST' });
+    expect(EventManager.onDispatch).toBeCalledWith({}, { type: 'TEST_EVENT_REQUEST' });
 
     expect(reducers.testEvent({}, { type: 'TEST_EVENT_SUCCESS' })).toEqual('success dispatched');
     expect(EventManager.onSuccess).toBeCalledWith({}, { type: 'TEST_EVENT_SUCCESS' });
@@ -330,7 +330,7 @@ describe('RequestEvent', () => {
     jest.useFakeTimers();
 
     const EventManager = {
-      onRequest: jest.fn(() => 'request dispatched'),
+      onDispatch: jest.fn(() => 'request dispatched'),
       onSuccess: jest.fn(() => 'success dispatched'),
       onFailure: jest.fn(() => 'failure dispatched'),
       afterSuccess: jest.fn(() => 'success dispatched'),
@@ -344,12 +344,12 @@ describe('RequestEvent', () => {
     expect(typeof reducers.testEvent).toBe('function');
 
     expect(reducers.testEvent({}, { type: 'notThisOne' })).toEqual({});
-    expect(EventManager.onRequest).not.toBeCalled();
+    expect(EventManager.onDispatch).not.toBeCalled();
     expect(EventManager.onSuccess).not.toBeCalled();
     expect(EventManager.onFailure).not.toBeCalled();
 
     expect(reducers.testEvent({}, { type: 'TEST_EVENT_REQUEST' })).toEqual('request dispatched');
-    expect(EventManager.onRequest).toBeCalledWith({}, { type: 'TEST_EVENT_REQUEST' });
+    expect(EventManager.onDispatch).toBeCalledWith({}, { type: 'TEST_EVENT_REQUEST' });
 
     expect(reducers.testEvent({}, { type: 'TEST_EVENT_SUCCESS' })).toEqual('success dispatched');
     expect(EventManager.onSuccess).toBeCalledWith({}, { type: 'TEST_EVENT_SUCCESS' });
@@ -399,7 +399,7 @@ describe('RequestEvent', () => {
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
-      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onRequest' }],
+      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onDispatch' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
