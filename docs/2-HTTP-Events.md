@@ -2,6 +2,21 @@
 
 The idea behind this library is to make data management easy and semantic, so we thought it would be best to include a special type of Event for making HTTP requests.
 
+First, if you want to use HTTPEvents, be sure to add the `eventsMiddleware` to your app's redux store when creating it. It does require you to have `redux` and `redux-thunk` installed.
+
+```js
+import thunk from 'redux-thunk';
+import { eventsMiddleware } from 'rel-events';
+import { createStore, applyMiddleware } from 'redux';
+
+import rootReducer from './myAppRootReducers';
+
+export const store = createStore(
+  rootReducer,
+  applyMiddleware(thunk, eventsMiddleware),
+);
+```
+
 A `HTTPEvent` has the very same API as the basic `Event`, but instead of having a manager with only an `onDispatch` method, we'll need to implement 4 methods: `onDispatch`. `onSuccess`, `onFailure` and `call`.
 
 ```js

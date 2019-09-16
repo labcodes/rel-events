@@ -5,24 +5,7 @@
 
 To install `rel-events`, just run `npm i --save rel-events`.
 
-After installing, be sure to read our [getting started guide](https://github.com/labcodes/rel-events/tree/master/docs/2-Getting-Started.md).
-
-With our library installed, we need to set up a couple of things.
-
-First, be sure to add the `eventsMiddleware` to your app's redux store when creating it. It does require you to have `redux` and `redux-thunk` installed.
-
-```js
-import thunk from 'redux-thunk';
-import { eventsMiddleware } from 'rel-events';
-import { createStore, applyMiddleware } from 'redux';
-
-import rootReducer from './myAppRootReducers';
-
-export const store = createStore(
-  rootReducer,
-  applyMiddleware(thunk, eventsMiddleware),
-);
-```
+If you wish to use Events to make HTTP Requests (which you probably do), there's another step to set things up. Follow our [HTTPEvents Guide](https://github.com/labcodes/rel-events/tree/master/docs/2-HTTP-Events.md) to have everything ready. :)
 
 With that done, you may start to create some events!
 
@@ -53,9 +36,9 @@ export const ChooseDateRangeEvent = new Event({
 
 Let's break step-by-step what this code means:
 
-First, you import the Event class from our lib, then instantiate a new event. This event receives an object with two required keys: `name` and `manager`. While `name` is self-explanatory, `manager` is not.
+First, you import the Event class from our lib, then instantiate a new event. This Event receives an object with two required keys: `name` and `manager`. While `name` is self-explanatory, `manager` is not.
 
-For default events, an event manager should have an `initialState` and implement an `onDispatch` method, which will be called whenever the event is dispatched. This is the alternative to the reducer part of the default redux flow.
+For default Events, an Event Manager should have an `initialState` and implement an `onDispatch` method, which will be called whenever the event is dispatched. This is the alternative to the reducer part of the default redux flow.
 
 We recommend using classes for your EventManagers as well, since we can decouple Events from their managers.
 
@@ -172,9 +155,4 @@ export default ChooseDateRangeEvent.register({
 })
 ```
 
-And that's it! We still have a lot of other features to discuss, but I'll talk about those later. Before that, let's talk about using events to make HTTP requests.
-
-
-## Phew, that was a LOT
-
-Yep. This guide tries to give you all the rel-evant information you need to know to use `rel-events`. If you're interested on more specific info, [take a look at our API docs](https://github.com/labcodes/rel-events/tree/master/docs/README.md), and if you're curious to know how the hell this works, take a look at our [How it works](https://github.com/labcodes/rel-events/tree/master/docs/6-How-it-works.md) guide or [jump into the source code](https://github.com/labcodes/rel-events/tree/master/)!
+And that's it! We still have a lot of other features to discuss, but I'll talk about those later. Before that, let's talk about [using events to make HTTP requests](https://github.com/labcodes/rel-events/tree/master/docs/2-HTTP-Events.md).
