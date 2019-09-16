@@ -11,7 +11,7 @@ With that done, you may start to create some events!
 
 ### Creating a basic Event
 
-Let's say you want to pass a range of dates from `DatePickerComponent` to `CalendarComponent`. Instead of creating actions and reducers, forget everything about redux and create an Event.
+Let's say you want to pass a range of dates from `DatePickerComponent` to `CalendarComponent`. Instead of creating actions and reducers, forget everything about redux; create an Event instead.
 
 To do that, you need to initialize a new Event. It's recommended you create it in a new file (`events.js`).
 
