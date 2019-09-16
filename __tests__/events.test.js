@@ -1,6 +1,6 @@
 import * as redux from 'react-redux';
 
-import { Event, RequestEvent, dispatchEvent, getCurrentStateFromEvent } from '../lib/events';
+import { Event, HTTPEvent, dispatchEvent, getCurrentStateFromEvent } from '../lib/events';
 
 describe('Event', () => {
   it('should initialize correctly', async () => {
@@ -40,23 +40,23 @@ describe('Event', () => {
 
   it('should throw error when initializing with invalid listenTo param', async () => {
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: {} })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event of RequestEvent.',
+      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
     );
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: [{}] })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event of RequestEvent.',
+      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
     );
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: [{ event: '' }] })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event of RequestEvent.',
+      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
     );
     expect(
       () => new Event({ name: 'testEvent', manager: {}, listenTo: [{ event: () => ({}) }] }),
     ).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event of RequestEvent.',
+      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
     );
     expect(
       () => new Event({ name: 'testEvent', manager: {}, listenTo: [{ trigger: '' }] }),
     ).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event of RequestEvent.',
+      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
     );
     expect(
       () =>
@@ -181,7 +181,7 @@ describe('Event', () => {
     const TestEvent = new Event({ name: 'testEvent', manager: {} });
 
     expect(() => TestEvent.register({ props: ['test'] })).toThrow(
-      'You must pass a Component inside the Component key when registering it to an event.',
+      'You must pass a Component inside the Component key when registering it to an Event.',
     );
   });
 
@@ -235,9 +235,9 @@ describe('Event', () => {
   });
 });
 
-describe('RequestEvent', () => {
+describe('HTTPEvent', () => {
   it('should initialize correctly', async () => {
-    let TestEvent = new RequestEvent({ name: 'testEvent', manager: {} });
+    let TestEvent = new HTTPEvent({ name: 'testEvent', manager: {} });
     expect(TestEvent).not.toHaveProperty('reducerName');
     expect(TestEvent.name).toEqual('testEvent');
     expect(TestEvent.manager).toEqual({});
@@ -250,7 +250,7 @@ describe('RequestEvent', () => {
 
     const mockEvent = jest.fn(() => 'event');
     const listenTo = [{ event: mockEvent, trigger: 'onDispatch' }];
-    TestEvent = new RequestEvent({ name: 'testEvent', manager: {}, listenTo });
+    TestEvent = new HTTPEvent({ name: 'testEvent', manager: {}, listenTo });
     expect(TestEvent).not.toHaveProperty('reducerName');
     expect(TestEvent.name).toEqual('testEvent');
     expect(TestEvent.manager).toEqual({});
@@ -266,7 +266,7 @@ describe('RequestEvent', () => {
     let EventManager = {
       call: jest.fn(() => 'api called'),
     };
-    let TestEvent = new RequestEvent({ name: 'testEvent', manager: EventManager });
+    let TestEvent = new HTTPEvent({ name: 'testEvent', manager: EventManager });
     let expectedReturn = {
       types: TestEvent.reducers,
       extraData: { test: 'data' },
@@ -282,7 +282,7 @@ describe('RequestEvent', () => {
       call: jest.fn(() => 'api called'),
       shouldDispatch: () => false,
     };
-    TestEvent = new RequestEvent({ name: 'testEvent', manager: EventManager });
+    TestEvent = new HTTPEvent({ name: 'testEvent', manager: EventManager });
     expectedReturn = {
       types: TestEvent.reducers,
       extraData: { test: 'data' },
@@ -303,7 +303,7 @@ describe('RequestEvent', () => {
       call: jest.fn(),
       initialState: { initial: 'state' },
     };
-    const TestEvent = new RequestEvent({ name: 'testEvent', manager: EventManager });
+    const TestEvent = new HTTPEvent({ name: 'testEvent', manager: EventManager });
     const reducers = TestEvent.createReducers();
 
     expect(reducers).toHaveProperty('testEvent');
@@ -337,7 +337,7 @@ describe('RequestEvent', () => {
       afterFailure: jest.fn(() => 'failure dispatched'),
       call: jest.fn(),
     };
-    const TestEvent = new RequestEvent({ name: 'testEvent', manager: EventManager });
+    const TestEvent = new HTTPEvent({ name: 'testEvent', manager: EventManager });
     const reducers = TestEvent.createReducers();
 
     expect(reducers).toHaveProperty('testEvent');
