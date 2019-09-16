@@ -69,6 +69,6 @@
   },
   "dependencies": {
     "react-redux": "^7.1.0",
-    "react-redux-api-tools": "^1.0.1"
+    "react-redux-api-tools": "^2.0.1"
   }
 }
