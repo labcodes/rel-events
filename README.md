@@ -95,7 +95,7 @@ export default combineReducers({
 });
 ```
 
-Notice the store names and reducers aren't declared anymore; you don't need to. Any Event object will deal with anything and everything redux related. To be able to do that, you only need to hook it to redux as the example above. To see more on how this works, read our [how it works docs](https://github.com/labcodes/rel-events/tree/master/docs/7-How-it-works.md).
+Notice the store names and reducers aren't declared anymore; you don't need to. Any Event object will deal with anything and everything redux related. To be able to do that, you only need to hook it to redux as the example above. To see more on how this works, read our [how it works docs](https://github.com/labcodes/rel-events/tree/master/docs/5-How-it-works.md).
 
 Now you have our Event ready to go! Now, you just need to register it to a Component, which can trigger it and/or listen to it.
 
