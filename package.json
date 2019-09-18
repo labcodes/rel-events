@@ -6,8 +6,9 @@
   "scripts": {
     "coveralls": "npm run test && cat ./coverage/lcov.info | coveralls",
     "lint": "eslint lib/** __tests__/**",
-    "test": "jest --coverage",
-    "jest": "jest",
+    "test": "npm run dist && jest --coverage",
+    "jest": "npm run dist && jest",
+    "dist": "./node_modules/.bin/babel lib -d dist",
     "test_debug": "node --inspect node_modules/.bin/jest"
   },
   "repository": {
@@ -28,6 +29,7 @@
   },
   "homepage": "https://github.com/labcodes/rel-event#readme",
   "devDependencies": {
+    "@babel/cli": "^7.6.0",
     "@babel/core": "^7.5.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-transform-runtime": "^7.5.0",
@@ -44,9 +46,9 @@
     "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
     "prettier": "^1.18.2",
-    "redux": "^4.0.4",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "redux": "^4.0.4"
   },
   "jest": {
     "automock": false,
@@ -64,7 +66,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run test"
+      "pre-commit": "npm run lint && npm run test && git add dist"
     }
   },
   "dependencies": {

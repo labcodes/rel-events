@@ -4,17 +4,18 @@
       "@babel/preset-env",
       {
         "targets": {
-          "node": "current",
-        },
-      },
-    ],
+          "node": "current"
+        }
+      }
+    ]
   ],
-  "env": {
-    "test": {
-      "plugins": [
-        "@babel/plugin-transform-runtime",
-        ["@babel/plugin-proposal-class-properties", { "loose": true }],
-      ],
-    }
-  }
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    [
+      "@babel/plugin-proposal-class-properties",
+      {
+        "loose": true
+      }
+    ]
+  ]
 }
