@@ -15,7 +15,7 @@ describe('Event', () => {
     expect(TestEvent.listenTo).toEqual([]);
 
     const mockEvent = jest.fn(() => 'event');
-    const listenTo = [{ event: mockEvent, trigger: 'onDispatch' }];
+    const listenTo = [{ event: mockEvent, triggerOn: 'dispatch' }];
     TestEvent = new Event({
       name: 'testEvent',
       manager: { initialState: { initial: 'state' } },
@@ -40,30 +40,30 @@ describe('Event', () => {
 
   it('should throw error when initializing with invalid listenTo param', async () => {
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: {} })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
+      'ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.',
     );
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: [{}] })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
+      'ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.',
     );
     expect(() => new Event({ name: 'testEvent', manager: {}, listenTo: [{ event: '' }] })).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
+      'ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.',
     );
     expect(
       () => new Event({ name: 'testEvent', manager: {}, listenTo: [{ event: () => ({}) }] }),
     ).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
+      'ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.',
     );
     expect(
-      () => new Event({ name: 'testEvent', manager: {}, listenTo: [{ trigger: '' }] }),
+      () => new Event({ name: 'testEvent', manager: {}, listenTo: [{ triggerOn: '' }] }),
     ).toThrow(
-      'ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.',
+      'ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.',
     );
     expect(
       () =>
         new Event({
           name: 'testEvent',
           manager: {},
-          listenTo: [{ event: () => ({}), trigger: 'onDispatch' }],
+          listenTo: [{ event: () => ({}), triggerOn: 'dispatch' }],
         }),
     ).not.toThrow();
   });
@@ -217,7 +217,7 @@ describe('Event', () => {
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
-      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onDispatch' }],
+      listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onDispatch' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
@@ -249,7 +249,7 @@ describe('HTTPEvent', () => {
     });
 
     const mockEvent = jest.fn(() => 'event');
-    const listenTo = [{ event: mockEvent, trigger: 'onDispatch' }];
+    const listenTo = [{ event: mockEvent, triggerOn: 'onDispatch' }];
     TestEvent = new HTTPEvent({ name: 'testEvent', manager: {}, listenTo });
     expect(TestEvent).not.toHaveProperty('reducerName');
     expect(TestEvent.name).toEqual('testEvent');
@@ -373,7 +373,7 @@ describe('HTTPEvent', () => {
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
-      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onSuccess' }],
+      listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onSuccess' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
@@ -390,7 +390,7 @@ describe('HTTPEvent', () => {
     expect(TestEvent.toRedux).toBeCalledWith('__UNSAFE_state');
   });
 
-  it('_chainEvents iterates listenTo array and does not call for unmatched trigger', async () => {
+  it('_chainEvents iterates listenTo array and does not call for unmatched triggerOn', async () => {
     jest.useFakeTimers();
     const ListenedEventReturnFunction = jest.fn(() => ({
       reducers: { onSuccess: 'LISTENED_EVENT' },
@@ -399,7 +399,7 @@ describe('HTTPEvent', () => {
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
-      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onDispatch' }],
+      listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onDispatch' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
@@ -425,7 +425,7 @@ describe('HTTPEvent', () => {
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
-      listenTo: [{ event: ListenedEventReturnFunction, trigger: 'onSuccess' }],
+      listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onSuccess' }],
     });
     const action = { type: 'NOT_LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent.toRedux = jest.fn(() => 'toReduxCalled');

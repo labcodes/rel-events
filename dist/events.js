@@ -65,10 +65,10 @@ class Event {
       if (listenTo.length) {
         listenTo.map(({
           event,
-          trigger
+          triggerOn
         }) => {
           event = event();
-          const reducer = event.reducerName ? event.reducerName : event.reducers[trigger];
+          const reducer = event.reducerName ? event.reducerName : event.reducers[triggerOn];
 
           if (action.type === reducer) {
             setTimeout(() => action.__UNSAFE_dispatch(toRedux(event.__UNSAFE_state)));
@@ -110,8 +110,8 @@ class Event {
       throw new Error('An Event should be initialized with an EventManager.');
     }
 
-    if (!Array.isArray(_listenTo) || !_listenTo.every(obj => obj.hasOwnProperty('event') && obj.hasOwnProperty('trigger') && typeof obj.event === 'function')) {
-      throw new Error('ListenTo must be an array of { event, trigger } objects, and the event key sould be a function that returns an Event or HTTPEvent.');
+    if (!Array.isArray(_listenTo) || !_listenTo.every(obj => obj.hasOwnProperty('event') && obj.hasOwnProperty('triggerOn') && typeof obj.event === 'function')) {
+      throw new Error('ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.');
     }
 
     this.name = _name;
