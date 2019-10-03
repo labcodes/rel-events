@@ -25,7 +25,7 @@ export const FetchUserDataHTTPEvent = new HTTPEvent({
   name: 'fetchUserData',
   manager: new FetchUserDataHTTPEventManager(),
   listenTo: [
-    { event: () => LoginHTTPEvent, trigger: 'onSuccess' },
+    { event: () => LoginHTTPEvent, triggerOn: 'success' },
   ]
 });
 ```

@@ -29,7 +29,7 @@ const ChooseDateRangeEvent = new Event({
   listenTo: [
     {
       event: () => Event/HTTPEvent instance,
-      trigger: String(depends on the event being listened: 'onDispatch' for normal Events, 'onDispatch'/'onSuccess'/'onFailure' for HTTPEvents)
+      triggerOn: String(depends on the event being listened: 'dispatch' for normal Events, 'dispatch'/'success'/'failure' for HTTPEvents)
     }
   ]
 });
