@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/labcodes/rel-events.svg?branch=master)](https://travis-ci.org/labcodes/rel-events) [![Coverage Status](https://coveralls.io/repos/github/labcodes/rel-events/badge.svg?branch=master)](https://coveralls.io/github/labcodes/rel-events?branch=master)
 
 *To read the docs, [go to our docs folder](https://github.com/labcodes/rel-events/tree/master/docs). :)*
+*To see the app demo, [go to out codesandbox page](https://codesandbox.io/s/rel-events-example-w6yji?fontsize=12)!*
 
 Welcome to the `rel-events` github repo!
 
