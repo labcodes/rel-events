@@ -28,6 +28,10 @@ describe('Event', () => {
     expect(TestEvent.listenTo).toEqual(listenTo);
   });
 
+  it('should throw an error when initializing with Empty', async () => {
+    expect(() => new Event()).toThrow('An Event should be initialized with an event name.');
+  });
+
   it('should throw error when initializing without name', async () => {
     expect(() => new Event({})).toThrow('An Event should be initialized with an event name.');
   });
@@ -260,6 +264,10 @@ describe('HTTPEvent', () => {
       success: 'TEST_EVENT_SUCCESS',
       failure: 'TEST_EVENT_FAILURE',
     });
+  });
+
+  it('should throw an error when initializing with Empty', async () => {
+    expect(() => new HTTPEvent()).toThrow('An Event should be initialized with an event name.');
   });
 
   it('toRedux should return correct data', async () => {
