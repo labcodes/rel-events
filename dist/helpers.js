@@ -3,8 +3,51 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.combineEventReducers = combineEventReducers;
 exports.dispatchEvent = dispatchEvent;
 exports.getCurrentStateFromEvent = getCurrentStateFromEvent;
+
+function _combineConflictingReducers(reducers) {
+  // needed for compatibility
+  const reducersArray = reducers.map(reducer => Object.values(reducer)[0]);
+  return (state, action) => {
+    for (let i = 0; i < reducersArray.length; i++) {
+      const reducer = reducersArray[i];
+      state = reducer(state, action);
+    }
+
+    return state;
+  };
+}
+
+function combineEventReducers(events = []) {
+  const conflictingEventsAndKeys = {};
+  const combinedReducers = {};
+  events.forEach(event => {
+    // eslint-disable-next-line prefer-destructuring
+    combinedReducers[event.name] = Object.values(event.createReducers())[0];
+
+    if (event.useDataFrom) {
+      if (!conflictingEventsAndKeys[event.useDataFrom]) {
+        conflictingEventsAndKeys[event.useDataFrom] = [];
+      }
+
+      conflictingEventsAndKeys[event.useDataFrom].push(event);
+    }
+  });
+  Object.keys(conflictingEventsAndKeys).forEach(eventName => {
+    let baseEvent = events.filter(event => event.name === eventName);
+
+    if (!baseEvent.length) {
+      throw new Error(`Event with ${eventName} not found.`);
+    } // eslint-disable-next-line prefer-destructuring
+
+
+    baseEvent = baseEvent[0];
+    combinedReducers[eventName] = _combineConflictingReducers([baseEvent.createReducers(), ...conflictingEventsAndKeys[eventName].map(event => event.createReducers())]);
+  });
+  return combinedReducers;
+}
 
 function dispatchEvent({
   event,
