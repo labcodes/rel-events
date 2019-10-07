@@ -5,6 +5,7 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     'arrow-body-style': ['error', 'as-needed'],
+    'no-plusplus': 'off',
     'no-param-reassign': 'off',
     'no-underscore-dangle': 'off',
     'no-prototype-builtins': 'off',
