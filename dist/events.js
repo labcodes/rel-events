@@ -102,16 +102,20 @@ class Event {
 
     this._formatReducerName = name => name.replace(/\.?([A-Z])/g, (_x, y) => `_${y.toLowerCase()}`).replace(/^_/, '').toUpperCase();
 
-    if (!_name) {
-      throw new Error('An Event should be initialized with an event name.');
-    }
+    if (arguments.length === 0) {
+      throw new Error('An Event should not be initialized without parameters.');
+    } else {
+      if (!_name) {
+        throw new Error('An Event should be initialized with an event name.');
+      }
 
-    if (!manager) {
-      throw new Error('An Event should be initialized with an EventManager.');
-    }
+      if (!manager) {
+        throw new Error('An Event should be initialized with an EventManager.');
+      }
 
-    if (!Array.isArray(_listenTo) || !_listenTo.every(obj => obj.hasOwnProperty('event') && obj.hasOwnProperty('triggerOn') && typeof obj.event === 'function')) {
-      throw new Error('ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.');
+      if (!Array.isArray(_listenTo) || !_listenTo.every(obj => obj.hasOwnProperty('event') && obj.hasOwnProperty('triggerOn') && typeof obj.event === 'function')) {
+        throw new Error('ListenTo must be an array of { event, triggerOn } objects, and the event key should be a function that returns an Event or HTTPEvent.');
+      }
     }
 
     this.name = _name;
