@@ -28,10 +28,6 @@ describe('Event', () => {
     expect(TestEvent.listenTo).toEqual(listenTo);
   });
 
-  it('should throw an error when initialized without parameters.', async () => {
-    expect(() => new Event()).toThrow('An Event should not be initialized without parameters.');
-  });
-
   it('should throw an error when initializing with Empty', async () => {
     expect(() => new Event()).toThrow('An Event should be initialized with an event name.');
   });
