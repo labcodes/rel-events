@@ -29,7 +29,7 @@ describe('Event', () => {
   });
 
   it('should throw an error when initializing with Empty', async () => {
-    expect(() => new Event()).toThrow('An Event should be initialized with an event name.');
+    expect(() => new Event()).toThrow('An Event should not be initialized without parameters.');
   });
 
   it('should throw error when initializing without name', async () => {
