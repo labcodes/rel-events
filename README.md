@@ -169,9 +169,7 @@ And that's it! We still have a lot of other features to discuss, but I'll talk a
 
 ### Contributing
 
-Don't hesitate to open an issue for bugs!
-
-But if you would like a new feature, it would be nice to discuss it before accepting PRs. We reserve ourselves the right to reject a feature that was not discussed or that will impact the code or API in a meaningful way. In that case, open an issue so we can discuss it thoroughly. Thanks. <3
+Thanks for wanting to contribute! Please, read our [Contributing guide](https://github.com/labcodes/rel-events/tree/master/docs/6-Contributing.md) carefully before opening PRs, though. We do enjoy PRs, but any PRs that don't follow our contributing guidelines will probably be rejected :/
 
 ### Thanks
 
