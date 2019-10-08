@@ -3,11 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports._combineConflictingReducers = _combineConflictingReducers;
 exports.combineEventReducers = combineEventReducers;
 exports.dispatchEvent = dispatchEvent;
 exports.getCurrentStateFromEvent = getCurrentStateFromEvent;
 
-function _combineConflictingReducers(reducers) {
+function _combineConflictingReducers(reducers = []) {
   // needed for compatibility
   const reducersArray = reducers.map(reducer => Object.values(reducer)[0]);
   return (state, action) => {
@@ -39,7 +40,7 @@ function combineEventReducers(events = []) {
     let baseEvent = events.filter(event => event.name === eventName);
 
     if (!baseEvent.length) {
-      throw new Error(`Event with ${eventName} not found.`);
+      throw new Error(`Event with ${eventName} name not found.`);
     } // eslint-disable-next-line prefer-destructuring
 
 
