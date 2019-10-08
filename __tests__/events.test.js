@@ -1,6 +1,5 @@
-import * as redux from 'react-redux';
-
-import { Event, HTTPEvent } from '../lib/events';
+// eslint-disable-next-line import/named
+import { Event, HTTPEvent, __RewireAPI__ } from '../lib/events';
 
 describe('Event', () => {
   it('should initialize correctly', async () => {
@@ -194,20 +193,21 @@ describe('Event', () => {
     const Component = {};
 
     const returnedConnect = jest.fn(() => 'final return');
-    redux.connect = jest.fn(() => returnedConnect);
+    const mockedReduxConnect = jest.fn(() => returnedConnect);
+    __RewireAPI__.__Rewire__('connect', mockedReduxConnect);
     TestEvent._bindDataToProps = jest.fn(() => 'bound data');
 
     let returnedValue = TestEvent.register({ Component, props: ['test'] });
     expect(returnedValue).toBe('final return');
 
-    expect(redux.connect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
+    expect(mockedReduxConnect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
     expect(TestEvent._bindDataToProps).toHaveBeenCalledWith(['test']);
     expect(returnedConnect).toHaveBeenCalledWith(Component);
 
     returnedValue = TestEvent.register({ Component });
     expect(returnedValue).toBe('final return');
 
-    expect(redux.connect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
+    expect(mockedReduxConnect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
     expect(TestEvent._bindDataToProps).toHaveBeenCalledWith([]);
     expect(returnedConnect).toHaveBeenCalledWith(Component);
   });
