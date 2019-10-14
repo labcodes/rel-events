@@ -157,6 +157,35 @@ describe('Event', () => {
     expect(TestEvent.__UNSAFE_state).toEqual({ test: 'it works!' });
   });
 
+  it('createReducers should return object containing reducers from other event for event with useDataFrom', async () => {
+    const EventManager = {
+      onDispatch: jest.fn(() => ({ test: 'it works!' })),
+      initialState: { initial: 'state' },
+    };
+    const TestEvent = new Event({
+      name: 'testEvent',
+      useDataFrom: 'otherEvent',
+      manager: EventManager,
+    });
+    TestEvent._chainEvents = jest.fn();
+    const reducers = TestEvent.createReducers();
+
+    expect(reducers).toHaveProperty('otherEvent');
+    expect(reducers.testEvent).toBeUndefined();
+    expect(typeof reducers.otherEvent).toBe('function');
+
+    expect(reducers.otherEvent(undefined, { type: 'notThisOne' })).toEqual(
+      EventManager.initialState,
+    );
+    expect(EventManager.onDispatch).not.toBeCalled();
+
+    expect(TestEvent._chainEvents).not.toBeCalled();
+    expect(reducers.otherEvent({}, { type: 'TEST_EVENT' })).toEqual({ test: 'it works!' });
+    expect(EventManager.onDispatch).toBeCalled();
+    expect(TestEvent._chainEvents).toBeCalledWith({ type: 'TEST_EVENT' });
+    expect(TestEvent.__UNSAFE_state).toEqual({ test: 'it works!' });
+  });
+
   it('createReducers should return object containing reducers with after dispatch', async () => {
     jest.useFakeTimers();
     const EventManager = {
@@ -210,6 +239,15 @@ describe('Event', () => {
     expect(mockedReduxConnect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
     expect(TestEvent._bindDataToProps).toHaveBeenCalledWith([]);
     expect(returnedConnect).toHaveBeenCalledWith(Component);
+  });
+
+  it('register should raise error when props key is passed to event with useDataFrom', async () => {
+    const TestEvent = new Event({ name: 'testEvent', useDataFrom: 'otherEvent', manager: {} });
+    const Component = {};
+
+    expect(() => TestEvent.register({ Component, props: ['test'] })).toThrow(
+      `When configuring 'useDataFrom', you will end up with an empty state. Listen to the event with the name described in the 'useDataFrom' key instead.`,
+    );
   });
 
   it('_chainEvents iterates listenTo array and calls correct functions for normal events', async () => {

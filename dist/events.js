@@ -23,23 +23,11 @@ class Event {
     this.createReducers = () => {
       const reducers = {};
 
-      reducers[this.name] = (state = this.manager.initialState, action) => {
-        if (action.type === this.reducerName) {
-          const newState = this.manager.onDispatch(state, action);
-
-          if (this.manager.afterDispatch) {
-            setTimeout(() => this.manager.afterDispatch(state, newState), 0);
-          }
-
-          this.__UNSAFE_state = newState;
-
-          this._chainEvents(action);
-
-          return newState;
-        }
-
-        return state;
-      };
+      if (this.useDataFrom) {
+        reducers[this.useDataFrom] = this._createReducersTo();
+      } else {
+        reducers[this.name] = this._createReducersTo();
+      }
 
       return reducers;
     };
@@ -53,6 +41,24 @@ class Event {
       }
 
       return (0, _reactRedux.connect)(this._bindDataToProps(props), this._bindDispatchToProps)(Component);
+    };
+
+    this._createReducersTo = () => (state = this.manager.initialState, action) => {
+      if (action.type === this.reducerName) {
+        const newState = this.manager.onDispatch(state, action);
+
+        if (this.manager.afterDispatch) {
+          setTimeout(() => this.manager.afterDispatch(state, newState), 0);
+        }
+
+        this.__UNSAFE_state = newState;
+
+        this._chainEvents(action);
+
+        return newState;
+      }
+
+      return state;
     };
 
     this._chainEvents = action => {
@@ -79,6 +85,10 @@ class Event {
     this._dispatch = reduxDispatch => dispatchData => reduxDispatch(this.toRedux(dispatchData));
 
     this._bindDataToProps = props => {
+      if (this.useDataFrom) {
+        throw new Error(`When configuring 'useDataFrom', you will end up with an empty state. Listen to the event with the name described in the 'useDataFrom' key instead.`);
+      }
+
       const {
         name
       } = this;
@@ -155,40 +165,34 @@ class HTTPEvent extends Event {
       };
     };
 
-    this.createReducers = () => {
-      const reducers = {};
+    this._createReducersTo = () => (state = this.manager.initialState, action) => {
+      let newState = state;
 
-      reducers[this.name] = (state = this.manager.initialState, action) => {
-        let newState = state;
+      if (action.type === this.reducers.request) {
+        newState = this.manager.onDispatch(state, action);
+      }
 
-        if (action.type === this.reducers.request) {
-          newState = this.manager.onDispatch(state, action);
+      if (action.type === this.reducers.success) {
+        newState = this.manager.onSuccess(state, action);
+
+        if (this.manager.afterSuccess) {
+          setTimeout(() => this.manager.afterSuccess(state, newState), 0);
         }
+      }
 
-        if (action.type === this.reducers.success) {
-          newState = this.manager.onSuccess(state, action);
+      if (action.type === this.reducers.failure) {
+        newState = this.manager.onFailure(state, action);
 
-          if (this.manager.afterSuccess) {
-            setTimeout(() => this.manager.afterSuccess(state, newState), 0);
-          }
+        if (this.manager.afterFailure) {
+          setTimeout(() => this.manager.afterFailure(state, newState), 0);
         }
+      }
 
-        if (action.type === this.reducers.failure) {
-          newState = this.manager.onFailure(state, action);
+      this.__UNSAFE_state = newState;
 
-          if (this.manager.afterFailure) {
-            setTimeout(() => this.manager.afterFailure(state, newState), 0);
-          }
-        }
+      this._chainEvents(action);
 
-        this.__UNSAFE_state = newState;
-
-        this._chainEvents(action);
-
-        return newState;
-      };
-
-      return reducers;
+      return newState;
     };
 
     delete this.reducerName;
