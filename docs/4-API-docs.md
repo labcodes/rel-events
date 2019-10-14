@@ -18,11 +18,17 @@ These API docs are literally the same for `Event` and `HTTPEvent` classes. The o
 Initializes a new Event/HTTPEvent instance.
 
 ```js
-new Event({ name: String, manager: Object, listenTo: Array.of(Object) });
+new Event({
+  name: String.isRequired,
+  manager: Object.isRequired,
+  useDataFrom: String,
+  listenTo: Array.of(Object),
+});
 
 // example:
 const ChooseDateRangeEvent = new Event({
   name: 'chooseDateRange',
+  useDataFrom: 'otherEvent',
   manager: {
     // refer to EventManager API docs
   },

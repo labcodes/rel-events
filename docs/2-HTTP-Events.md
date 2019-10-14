@@ -75,11 +75,11 @@ And remember to hook up the event on redux and register your components!
 ```js
 // on myAppRootReducers.js
 import { combineReducers } from 'redux';
+import { combineEventReducers } from 'rel-events';
 import { ChooseDateRangeEvent, LoginHTTPEvent } from './events.js';
 
 export default combineReducers({
-  ...ChooseDateRangeEvent.createReducers(),
-  ...LoginHTTPEvent.createReducers(), // <<< new line here
+  ...combineEventReducers([ ChooseDateRangeEvent, LoginHTTPEvent ]),
 });
 
 // on LoginComponent.js
