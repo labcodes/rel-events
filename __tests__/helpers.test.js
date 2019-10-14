@@ -121,8 +121,6 @@ describe('combineEventReducers', () => {
     ]);
     expect(returnedData).toEqual({
       event1: { test: 'return' },
-      event2: 'called2',
-      event3: 'called3',
     });
   });
 });

@@ -25,15 +25,15 @@ function combineEventReducers(events = []) {
   const conflictingEventsAndKeys = {};
   const combinedReducers = {};
   events.forEach(event => {
-    // eslint-disable-next-line prefer-destructuring
-    combinedReducers[event.name] = Object.values(event.createReducers())[0];
-
     if (event.useDataFrom) {
       if (!conflictingEventsAndKeys[event.useDataFrom]) {
         conflictingEventsAndKeys[event.useDataFrom] = [];
       }
 
       conflictingEventsAndKeys[event.useDataFrom].push(event);
+    } else {
+      // eslint-disable-next-line prefer-destructuring
+      combinedReducers[event.name] = Object.values(event.createReducers())[0];
     }
   });
   Object.keys(conflictingEventsAndKeys).forEach(eventName => {
