@@ -88,11 +88,12 @@ With the event instantiated, you need to hook it up to redux so it can be dispat
 ```js
 // on myAppRootReducers.js
 import { combineReducers } from 'redux';
+import { combineEventReducers } from 'rel-events';
 import { ChooseDateRangeEvent } from './events.js';
 
 // remember to use object spread, so it's set up correctly
 export default combineReducers({
-  ...ChooseDateRangeEvent.createReducers(),
+  ...combineEventReducers([ ChooseDateRangeEvent ]),
 });
 ```
 
