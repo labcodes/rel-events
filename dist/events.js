@@ -85,7 +85,7 @@ class Event {
     this._dispatch = reduxDispatch => dispatchData => reduxDispatch(this.toRedux(dispatchData));
 
     this._bindDataToProps = props => {
-      if (this.useDataFrom) {
+      if (this.useDataFrom && props.length) {
         throw new Error(`When configuring 'useDataFrom', you will end up with an empty state. Listen to the event with the name described in the 'useDataFrom' key instead.`);
       }
 
