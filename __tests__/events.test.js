@@ -1,6 +1,5 @@
-import * as redux from 'react-redux';
-
-import { Event, HTTPEvent, dispatchEvent, getCurrentStateFromEvent } from '../lib/events';
+// eslint-disable-next-line import/named
+import { Event, HTTPEvent, __RewireAPI__ } from '../lib/events';
 
 describe('Event', () => {
   it('should initialize correctly', async () => {
@@ -158,6 +157,35 @@ describe('Event', () => {
     expect(TestEvent.__UNSAFE_state).toEqual({ test: 'it works!' });
   });
 
+  it('createReducers should return object containing reducers from other event for event with useDataFrom', async () => {
+    const EventManager = {
+      onDispatch: jest.fn(() => ({ test: 'it works!' })),
+      initialState: { initial: 'state' },
+    };
+    const TestEvent = new Event({
+      name: 'testEvent',
+      useDataFrom: 'otherEvent',
+      manager: EventManager,
+    });
+    TestEvent._chainEvents = jest.fn();
+    const reducers = TestEvent.createReducers();
+
+    expect(reducers).toHaveProperty('otherEvent');
+    expect(reducers.testEvent).toBeUndefined();
+    expect(typeof reducers.otherEvent).toBe('function');
+
+    expect(reducers.otherEvent(undefined, { type: 'notThisOne' })).toEqual(
+      EventManager.initialState,
+    );
+    expect(EventManager.onDispatch).not.toBeCalled();
+
+    expect(TestEvent._chainEvents).not.toBeCalled();
+    expect(reducers.otherEvent({}, { type: 'TEST_EVENT' })).toEqual({ test: 'it works!' });
+    expect(EventManager.onDispatch).toBeCalled();
+    expect(TestEvent._chainEvents).toBeCalledWith({ type: 'TEST_EVENT' });
+    expect(TestEvent.__UNSAFE_state).toEqual({ test: 'it works!' });
+  });
+
   it('createReducers should return object containing reducers with after dispatch', async () => {
     jest.useFakeTimers();
     const EventManager = {
@@ -194,22 +222,32 @@ describe('Event', () => {
     const Component = {};
 
     const returnedConnect = jest.fn(() => 'final return');
-    redux.connect = jest.fn(() => returnedConnect);
+    const mockedReduxConnect = jest.fn(() => returnedConnect);
+    __RewireAPI__.__Rewire__('connect', mockedReduxConnect);
     TestEvent._bindDataToProps = jest.fn(() => 'bound data');
 
     let returnedValue = TestEvent.register({ Component, props: ['test'] });
     expect(returnedValue).toBe('final return');
 
-    expect(redux.connect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
+    expect(mockedReduxConnect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
     expect(TestEvent._bindDataToProps).toHaveBeenCalledWith(['test']);
     expect(returnedConnect).toHaveBeenCalledWith(Component);
 
     returnedValue = TestEvent.register({ Component });
     expect(returnedValue).toBe('final return');
 
-    expect(redux.connect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
+    expect(mockedReduxConnect).toHaveBeenCalledWith('bound data', TestEvent._bindDispatchToProps);
     expect(TestEvent._bindDataToProps).toHaveBeenCalledWith([]);
     expect(returnedConnect).toHaveBeenCalledWith(Component);
+  });
+
+  it('register should raise error when props key is passed to event with useDataFrom', async () => {
+    const TestEvent = new Event({ name: 'testEvent', useDataFrom: 'otherEvent', manager: {} });
+    const Component = {};
+
+    expect(() => TestEvent.register({ Component, props: ['test'] })).toThrow(
+      `When configuring 'useDataFrom', you will end up with an empty state. Listen to the event with the name described in the 'useDataFrom' key instead.`,
+    );
   });
 
   it('_chainEvents iterates listenTo array and calls correct functions for normal events', async () => {
@@ -448,61 +486,5 @@ describe('HTTPEvent', () => {
     jest.runAllTimers();
     expect(action.__UNSAFE_dispatch).not.toBeCalled();
     expect(TestEvent.toRedux).not.toBeCalled();
-  });
-});
-
-describe('getCurrentStateFromEvent', () => {
-  it('should throw if we do not pass an event', async () => {
-    expect(() => getCurrentStateFromEvent({})).toThrow('You need to pass an event.');
-  });
-
-  it('should throw if we do not pass the appState', async () => {
-    expect(() => getCurrentStateFromEvent({ event: {} })).toThrow(
-      'You need to pass your app state. This is only available inside `shouldDispatch` methods or imported manually (not recommended).',
-    );
-  });
-
-  it('should return correct data', async () => {
-    expect(
-      getCurrentStateFromEvent({ event: { name: 'testEvent' }, appState: { testEvent: 'data' } }),
-    ).toEqual('data');
-  });
-});
-
-describe('dispatchEvent', () => {
-  it('should throw if we do not pass an event', async () => {
-    expect(() => dispatchEvent({})).toThrow('You need to pass an event.');
-  });
-
-  it('should throw if we do not pass an event with a toRedux method', async () => {
-    expect(() => dispatchEvent({ event: {} })).toThrow(
-      'The event you passed needs to have a `toRedux` method. Are you sure you instantiated and passed the correct event?',
-    );
-  });
-
-  it('should throw if we do not pass a store', async () => {
-    expect(() => dispatchEvent({ event: { toRedux: () => {} } })).toThrow(
-      'You need to pass your redux store.',
-    );
-  });
-
-  it('should throw if we do not pass a store with a dispatch method', async () => {
-    expect(() => dispatchEvent({ event: { toRedux: () => {} }, store: {} })).toThrow(
-      'The store you passed does not have a `dispatch` method. Are you sure you passed the correct variable as the store?',
-    );
-  });
-
-  it('should call store.dispatch passing event.redux with data', async () => {
-    const event = {
-      toRedux: jest.fn(),
-    };
-    const store = {
-      dispatch: jest.fn(),
-    };
-
-    dispatchEvent({ event, store, data: { test: 'data' } });
-
-    expect(event.toRedux).toHaveBeenCalledWith({ test: 'data' });
-    expect(store.dispatch).toHaveBeenCalledWith(event.toRedux({ test: 'data' }));
   });
 });

@@ -34,6 +34,34 @@ That means that, whenever the login is successful, `fetchUserData` will be trigg
 
 **One caveat** is that the `event` value is **not** a direct reference to the Event that will be listened to. Instead, it's a function that returns the reference. That's needed because we could be using multiple files for multiple Events, and, if we do, we can't guarantee that `FetchUserDataHTTPEvent` will be loaded into memory before `LoginHTTPEvent`. If that happened, the `event` value would be `undefined`, so we chose to receive a function instead.
 
+### `useDataFrom` optional Event parameter
+
+If you want, for example, to clear data from an Event, you'll notice there isn't a way inside the same Event to do so. Instead, you must create a new Event that writes data to the first Event's state.
+
+```js
+// on events.js
+import { Event, HTTPEvent } from 'rel-events';
+import { LoginHTTPEventManager, FetchUserDataHTTPEventManager } from './eventManagers.js';
+
+export const LoginHTTPEvent = new HTTPEvent({
+  name: 'login',
+  manager: new LoginHTTPEventManager(),
+});
+
+export const ClearLoginDataEvent = new Event({
+  name: 'clearLoginData',
+  useDataFrom: 'login', // <-- we use the LoginHTTPEvent's name to link it's data to this new Event
+  manager: {
+    initialState: { isAuthenticated: false },
+    onDispatch: () => initialState,
+  }
+});
+```
+
+You may use this optional param with HTTPEvents as well.
+
+One thing to keep in mind: since this second Event uses the data from another, it can't be registered to a component passing a `props` key, since it doesn't have data of it's own. Don't worry, we'll warn if you if that happens. :)
+
 ### `shouldDispatch` optional method - helped by the `getCurrentStateFromEvent` helper
 
 If you're dealing with a situation in which you don't want to dispatch an event based on certain conditions, you should probably implement a `shouldDispatch` method on your event manager.

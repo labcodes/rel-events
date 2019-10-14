@@ -9,13 +9,29 @@
       }
     ]
   ],
-  "plugins": [
-    "@babel/plugin-transform-runtime",
-    [
-      "@babel/plugin-proposal-class-properties",
-      {
-        "loose": true
-      }
-    ]
-  ]
+  "env": {
+    "production": {
+      "plugins": [
+        "@babel/plugin-transform-runtime",
+        [
+          "@babel/plugin-proposal-class-properties",
+          {
+            "loose": true
+          }
+        ]
+      ]
+    },
+    "test": {
+      "plugins": [
+        "@babel/plugin-transform-runtime",
+        "rewire",
+        [
+          "@babel/plugin-proposal-class-properties",
+          {
+            "loose": true
+          }
+        ]
+      ]
+    }
+  }
 }
