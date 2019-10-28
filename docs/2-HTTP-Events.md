@@ -103,7 +103,7 @@ If you want to make multiple requests in the same call, instead of returning a s
 import { fetchFromApi } from 'rel-events';
 
 export class GetProductsHTTPEventManager {
-  initialState = { isLoading: false, username: 'Anonymous' };
+  // ...
 
   call = () => {
     return () => Promise.all([ fetchFromApi('/api/products/1'), fetchFromApi('/api/products/2'), ]);
@@ -113,7 +113,7 @@ export class GetProductsHTTPEventManager {
 }
 ```
 
-When all of them are successful, the `onSuccess` handles will be called, and the `event.response` will be an array of `Response` objects. If one of them fails, the `onFailure` handler will be called passing the `Error` instance (most probably a `TypeError: Failed to fetch` error).
+When all of them are successful, the `onSuccess` handler will be called, and the `event.response` will be an array of `Response` objects. If any of them fails, the `onFailure` handler will be called passing the `Error` instance (most probably a `TypeError: Failed to fetch` error).
 
 ---------------
 
