@@ -94,4 +94,27 @@ class LoginComponent extends React.Component {
 export default LoginHTTPEvent.register({ Component: LoginComponent });
 ```
 
+#### Making multiple requests at the same time
+
+If you want to make multiple requests in the same call, instead of returning a single `fetchFromApi` call, you may use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) passing a list of `fetchFromApi` calls:
+
+```js
+// on eventManagers.js
+import { fetchFromApi } from 'rel-events';
+
+export class GetProductsHTTPEventManager {
+  // ...
+
+  call = () => {
+    return () => Promise.all([ fetchFromApi('/api/products/1'), fetchFromApi('/api/products/2'), ]);
+  }
+
+  // ...
+}
+```
+
+When all of them are successful, the `onSuccess` handler will be called, and the `event.response` will be an array of `Response` objects. If any of them fails, the `onFailure` handler will be called passing the `Error` instance (most probably a `TypeError: Failed to fetch` error).
+
+---------------
+
 Now that we're done here, maybe you should take a look at some other goodies we have on the Advanced Usage section :)
