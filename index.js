@@ -46,9 +46,9 @@ Object.defineProperty(exports, "combineEventReducers", {
   }
 });
 
-var _middleware = _interopRequireDefault(require("react-redux-api-tools/lib/middleware"));
+var _middleware = _interopRequireDefault(require("react-redux-api-tools/dist/middleware"));
 
-var _api = _interopRequireDefault(require("react-redux-api-tools/lib/api"));
+var _api = _interopRequireDefault(require("react-redux-api-tools/dist/api"));
 
 var _events = require("./dist/events");
 
