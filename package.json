@@ -49,6 +49,7 @@
     "prettier": "^1.18.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-redux": "^5",
     "redux": "^4.0.4"
   },
   "jest": {
@@ -70,8 +71,10 @@
       "pre-commit": "npm run lint && npm run test && git add dist"
     }
   },
+  "peerDependencies": {
+    "react-redux": "^5"
+  },
   "dependencies": {
-    "react-redux": "^7.1.0",
     "react-redux-api-tools": "^2.1.1"
   }
 }
