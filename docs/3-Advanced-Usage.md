@@ -1,6 +1,26 @@
 
 ## Advanced Usage: Other features and goodies
 
+### Using `extraData` on Event Managers
+
+Whenever you call an Event/HTTPEvent, data that is passed to its 'call' or 'onDispatch' method is automatically added to the event instance in the `extraData` key.
+
+That means that if, for example, you want to persist some data on an Event, you may just do this:
+
+```js
+// on eventManagers.js
+
+export class ExampleEventManager {
+  name: 'login',
+  manager: {
+    initialState: {},
+    // just set a new key passing the event.extraData value
+    onDispatch: (state, event) => ({ ...state, data: event.extraData })
+  },
+}
+
+```
+
 ### Event Chaining - Making Events listen to Events
 
 Sometimes, we want to make an Event be triggered by the completion of another. Let's imagine that, after logging in an user, we need to go somewhere to get the user's data.
