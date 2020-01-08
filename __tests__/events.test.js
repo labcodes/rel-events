@@ -112,7 +112,9 @@ describe('Event', () => {
     let TestEvent = new Event({ name: 'testEvent', manager: {} });
     let expectedReturn = {
       type: 'TEST_EVENT',
-      test: 'yes',
+      extraData: {
+        test: 'yes',
+      },
       shouldDispatch: expect.any(Function),
     };
 
@@ -124,7 +126,9 @@ describe('Event', () => {
     TestEvent = new Event({ name: 'testEvent', manager: { shouldDispatch } });
     expectedReturn = {
       type: 'TEST_EVENT',
-      test: 'yes',
+      extraData: {
+        test: 'yes',
+      },
       shouldDispatch,
     };
 
