@@ -75,6 +75,7 @@
     "react-redux": "^5"
   },
   "dependencies": {
+    "lodash.debounce": "^4.0.8",
     "react-redux-api-tools": "^2.1.1"
   }
 }
