@@ -23,6 +23,8 @@ new Event({
   manager: Object.isRequired,
   useDataFrom: String,
   listenTo: Array.of(Object),
+  debounce: Boolean,
+  debounceDelay: Number,
 });
 
 // example:
@@ -37,7 +39,9 @@ const ChooseDateRangeEvent = new Event({
       event: () => Event/HTTPEvent instance,
       triggerOn: String(depends on the event being listened: 'dispatch' for normal Events, 'dispatch'/'success'/'failure' for HTTPEvents)
     }
-  ]
+  ],
+  debounce: true,
+  debounceDelay: 500,
 });
 ```
 
@@ -103,19 +107,6 @@ export default combineReducers({
   ...ChooseDateRangeEvent.createReducers(),
   // returns { 'chooseDateRange': (state, action) => { ... } }
 });
-```
-
-### Event.toRedux
-
-"Serializes" data in a way that redux knows how to dispatch. Receives an object and returns an object. Mostly used internally. Unsafe.
-
-```js
-EventInstance.toRedux({ data });
-// returns an object of { type: formatted event.name, shouldDispatch: Function -> Boolean,  ...data }
-
-// example:
-ChooseDateRangeEvent.toRedux({ startDate: new Date, endDate: new Date });
-// returns { type: 'CHOOSE_DATE_RANGE', shouldDispatch: () => true, startDate, endDate }
 ```
 
 ---------------------------------------
