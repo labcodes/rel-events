@@ -12,6 +12,8 @@ describe('Event', () => {
     expect(TestEvent.__UNSAFE_state).toEqual({ initial: 'state' });
     expect(TestEvent.reducerName).toEqual('TEST_EVENT');
     expect(TestEvent.listenTo).toEqual([]);
+    expect(TestEvent.debounce).toEqual(false);
+    expect(TestEvent.debounceDuration).toEqual(500);
 
     const mockEvent = jest.fn(() => 'event');
     const listenTo = [{ event: mockEvent, triggerOn: 'dispatch' }];
@@ -19,12 +21,16 @@ describe('Event', () => {
       name: 'testEvent',
       manager: { initialState: { initial: 'state' } },
       listenTo,
+      debounce: true,
+      debounceDuration: 200,
     });
     expect(TestEvent.name).toEqual('testEvent');
     expect(TestEvent.manager).toEqual({ initialState: { initial: 'state' } });
     expect(TestEvent.__UNSAFE_state).toEqual({ initial: 'state' });
     expect(TestEvent.reducerName).toEqual('TEST_EVENT');
     expect(TestEvent.listenTo).toEqual(listenTo);
+    expect(TestEvent.debounce).toEqual(true);
+    expect(TestEvent.debounceDuration).toEqual(200);
   });
 
   it('should throw an error when initializing with Empty', async () => {
@@ -39,6 +45,13 @@ describe('Event', () => {
     expect(() => new Event({ name: 'testEvent' })).toThrow(
       'An Event should be initialized with an EventManager.',
     );
+  });
+
+  it('should throw error when initializing with debounce true and non number duration', async () => {
+    expect(
+      () =>
+        new Event({ name: 'testEvent', manager: {}, debounce: true, debounceDuration: 'wrong' }),
+    ).toThrow('When debounce is true, debounceDuration needs to be a Number.');
   });
 
   it('should throw error when initializing with invalid listenTo param', async () => {
@@ -71,16 +84,44 @@ describe('Event', () => {
     ).not.toThrow();
   });
 
-  it('_dispatch should call toRedux passing data using redux dispatch', async () => {
+  it('_callRedux should call _formatToRedux passing data using redux dispatch', async () => {
     const TestEvent = new Event({ name: 'testEvent', manager: {} });
-    TestEvent.toRedux = jest.fn();
-    const data = { test: 'data' };
     const reduxDispatch = jest.fn();
 
-    TestEvent._dispatch(reduxDispatch)(data);
+    TestEvent._formatToRedux = jest.fn();
+    TestEvent.__UNSAFE_reduxDispatch = reduxDispatch;
+
+    const data = { test: 'data' };
+
+    TestEvent._callRedux(data);
 
     expect(reduxDispatch).toBeCalled();
-    expect(TestEvent.toRedux).toBeCalledWith({ ...data, shouldDispatch: expect.Function });
+    expect(TestEvent._formatToRedux).toBeCalledWith({ ...data, shouldDispatch: expect.Function });
+  });
+
+  it('_callRedux should be debounced if Event is initialized with debounce as true', async () => {
+    const mockedDebounce = jest.fn(() => data => data);
+    __RewireAPI__.__Rewire__('_debounce', mockedDebounce);
+
+    const TestEvent = new Event({ name: 'testEvent', manager: {}, debounce: true });
+
+    expect(TestEvent._callRedux('test')).toEqual('test');
+    expect(mockedDebounce).toHaveBeenCalledWith(expect.any(Function), TestEvent.debounceDuration);
+  });
+
+  it('debounced _callRedux should use passed debounceDuration if debouce is true', async () => {
+    const mockedDebounce = jest.fn(() => data => data);
+    __RewireAPI__.__Rewire__('_debounce', mockedDebounce);
+
+    const TestEvent = new Event({
+      name: 'testEvent',
+      manager: {},
+      debounce: true,
+      debounceDuration: 200,
+    });
+
+    expect(TestEvent._callRedux('test')).toEqual('test');
+    expect(mockedDebounce).toHaveBeenCalledWith(expect.any(Function), 200);
   });
 
   it('_bindDataToProps should map state and set event on it', async () => {
@@ -97,18 +138,20 @@ describe('Event', () => {
     expect(mappedState).toHaveProperty('yep');
   });
 
-  it('_bindDispatchToProps should map actions and pass redux dispatch', async () => {
+  it('_bindDispatchToProps should map actions and set __UNSAFE_reduxDispatch', async () => {
     const reduxDispatch = jest.fn();
     const TestEvent = new Event({ name: 'testEvent', manager: {} });
-    TestEvent._dispatch = jest.fn(() => 'dispatched');
+    TestEvent._callRedux = jest.fn(() => 'dispatched');
+
+    expect(TestEvent.__UNSAFE_reduxDispatch).toBeUndefined();
 
     const _bindDispatchToProps = TestEvent._bindDispatchToProps(reduxDispatch);
 
-    expect(TestEvent._dispatch).toHaveBeenCalledWith(reduxDispatch);
-    expect(_bindDispatchToProps.testEvent).toEqual('dispatched');
+    expect(TestEvent.__UNSAFE_reduxDispatch).toEqual(reduxDispatch);
+    expect(_bindDispatchToProps.testEvent()).toEqual('dispatched');
   });
 
-  it('toRedux should return correct data', async () => {
+  it('_formatToRedux should return correct data', async () => {
     let TestEvent = new Event({ name: 'testEvent', manager: {} });
     let expectedReturn = {
       type: 'TEST_EVENT',
@@ -118,7 +161,7 @@ describe('Event', () => {
       shouldDispatch: expect.any(Function),
     };
 
-    let returnedValue = TestEvent.toRedux({ test: 'yes' });
+    let returnedValue = TestEvent._formatToRedux({ test: 'yes' });
     expect(returnedValue).toEqual(expectedReturn);
     expect(returnedValue.shouldDispatch()).toEqual(true);
 
@@ -132,7 +175,7 @@ describe('Event', () => {
       shouldDispatch,
     };
 
-    returnedValue = TestEvent.toRedux({ test: 'yes' });
+    returnedValue = TestEvent._formatToRedux({ test: 'yes' });
     expect(returnedValue).toEqual(expectedReturn);
     expect(returnedValue.shouldDispatch()).toEqual('lala');
   });
@@ -266,18 +309,19 @@ describe('Event', () => {
       listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onDispatch' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
-    TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
+    TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
+    TestEvent.__UNSAFE_reduxDispatch = jest.fn();
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
-    expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
+    expect(TestEvent.__UNSAFE_reduxDispatch).not.toBeCalled();
 
     jest.runAllTimers();
-    expect(action.__UNSAFE_dispatch).toBeCalledWith('toReduxCalled');
-    expect(TestEvent.toRedux).toBeCalledWith('__UNSAFE_state');
+    expect(TestEvent.__UNSAFE_reduxDispatch).toBeCalledWith('_formatToReduxCalled');
+    expect(TestEvent._formatToRedux).toBeCalledWith('__UNSAFE_state');
   });
 });
 
@@ -312,7 +356,7 @@ describe('HTTPEvent', () => {
     expect(() => new HTTPEvent()).toThrow('An Event should be initialized with an event name.');
   });
 
-  it('toRedux should return correct data', async () => {
+  it('_formatToRedux should return correct data', async () => {
     let EventManager = {
       call: jest.fn(() => 'api called'),
     };
@@ -324,9 +368,9 @@ describe('HTTPEvent', () => {
       shouldDispatch: expect.any(Function),
     };
 
-    let toReduxReturn = TestEvent.toRedux({ test: 'data' });
-    expect(toReduxReturn).toEqual(expectedReturn);
-    expect(toReduxReturn.shouldDispatch()).toBeTruthy();
+    let _formatToReduxReturn = TestEvent._formatToRedux({ test: 'data' });
+    expect(_formatToReduxReturn).toEqual(expectedReturn);
+    expect(_formatToReduxReturn.shouldDispatch()).toBeTruthy();
 
     EventManager = {
       call: jest.fn(() => 'api called'),
@@ -340,9 +384,9 @@ describe('HTTPEvent', () => {
       shouldDispatch: EventManager.shouldDispatch,
     };
 
-    toReduxReturn = TestEvent.toRedux({ test: 'data' });
-    expect(toReduxReturn).toEqual(expectedReturn);
-    expect(toReduxReturn.shouldDispatch()).toBeFalsy();
+    _formatToReduxReturn = TestEvent._formatToRedux({ test: 'data' });
+    expect(_formatToReduxReturn).toEqual(expectedReturn);
+    expect(_formatToReduxReturn.shouldDispatch()).toBeFalsy();
   });
 
   it('createReducers should return object containing reducers', async () => {
@@ -426,18 +470,19 @@ describe('HTTPEvent', () => {
       listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onSuccess' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
-    TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
+    TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
+    TestEvent.__UNSAFE_reduxDispatch = jest.fn();
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
-    expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
+    expect(TestEvent.__UNSAFE_reduxDispatch).not.toBeCalled();
 
     jest.runAllTimers();
-    expect(action.__UNSAFE_dispatch).toBeCalledWith('toReduxCalled');
-    expect(TestEvent.toRedux).toBeCalledWith('__UNSAFE_state');
+    expect(TestEvent.__UNSAFE_reduxDispatch).toBeCalledWith('_formatToReduxCalled');
+    expect(TestEvent._formatToRedux).toBeCalledWith('__UNSAFE_state');
   });
 
   it('_chainEvents iterates listenTo array and does not call for unmatched triggerOn', async () => {
@@ -452,18 +497,18 @@ describe('HTTPEvent', () => {
       listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onDispatch' }],
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
-    TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
+    TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
     expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
 
     jest.runAllTimers();
     expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
   });
 
   it('_chainEvents iterates listenTo array and does not call strange events', async () => {
@@ -478,17 +523,17 @@ describe('HTTPEvent', () => {
       listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onSuccess' }],
     });
     const action = { type: 'NOT_LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
-    TestEvent.toRedux = jest.fn(() => 'toReduxCalled');
+    TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
     expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
 
     jest.runAllTimers();
     expect(action.__UNSAFE_dispatch).not.toBeCalled();
-    expect(TestEvent.toRedux).not.toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
   });
 });
