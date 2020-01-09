@@ -40,8 +40,8 @@ var Event = function Event() {
       useDataFrom = _ref.useDataFrom,
       _ref$debounce = _ref.debounce,
       debounce = _ref$debounce === void 0 ? false : _ref$debounce,
-      _ref$debounceDuration = _ref.debounceDuration,
-      debounceDuration = _ref$debounceDuration === void 0 ? 500 : _ref$debounceDuration,
+      _ref$debounceDelay = _ref.debounceDelay,
+      debounceDelay = _ref$debounceDelay === void 0 ? 300 : _ref$debounceDelay,
       _ref$listenTo = _ref.listenTo,
       _listenTo = _ref$listenTo === void 0 ? [] : _ref$listenTo;
 
@@ -180,21 +180,21 @@ var Event = function Event() {
     }
   }
 
-  if (debounce && !isNumber(debounceDuration)) {
-    throw new Error('When debounce is true, debounceDuration needs to be a Number.');
+  if (debounce && !isNumber(debounceDelay)) {
+    throw new Error('When debounce is true, debounceDelay needs to be a Number.');
   }
 
   this.name = _name;
   this.manager = manager;
   this.debounce = debounce;
-  this.debounceDuration = debounceDuration;
+  this.debounceDelay = debounceDelay;
   this.listenTo = _listenTo;
   this.useDataFrom = useDataFrom;
   this.__UNSAFE_state = manager.initialState;
   this.reducerName = this._formatReducerName(this.name);
 
   if (this.debounce) {
-    this._callRedux = _debounce(this._callRedux, this.debounceDuration);
+    this._callRedux = _debounce(this._callRedux, this.debounceDelay);
   }
 };
 

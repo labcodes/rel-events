@@ -13,7 +13,7 @@ describe('Event', () => {
     expect(TestEvent.reducerName).toEqual('TEST_EVENT');
     expect(TestEvent.listenTo).toEqual([]);
     expect(TestEvent.debounce).toEqual(false);
-    expect(TestEvent.debounceDuration).toEqual(500);
+    expect(TestEvent.debounceDelay).toEqual(300);
 
     const mockEvent = jest.fn(() => 'event');
     const listenTo = [{ event: mockEvent, triggerOn: 'dispatch' }];
@@ -22,7 +22,7 @@ describe('Event', () => {
       manager: { initialState: { initial: 'state' } },
       listenTo,
       debounce: true,
-      debounceDuration: 200,
+      debounceDelay: 200,
     });
     expect(TestEvent.name).toEqual('testEvent');
     expect(TestEvent.manager).toEqual({ initialState: { initial: 'state' } });
@@ -30,7 +30,7 @@ describe('Event', () => {
     expect(TestEvent.reducerName).toEqual('TEST_EVENT');
     expect(TestEvent.listenTo).toEqual(listenTo);
     expect(TestEvent.debounce).toEqual(true);
-    expect(TestEvent.debounceDuration).toEqual(200);
+    expect(TestEvent.debounceDelay).toEqual(200);
   });
 
   it('should throw an error when initializing with Empty', async () => {
@@ -49,9 +49,8 @@ describe('Event', () => {
 
   it('should throw error when initializing with debounce true and non number duration', async () => {
     expect(
-      () =>
-        new Event({ name: 'testEvent', manager: {}, debounce: true, debounceDuration: 'wrong' }),
-    ).toThrow('When debounce is true, debounceDuration needs to be a Number.');
+      () => new Event({ name: 'testEvent', manager: {}, debounce: true, debounceDelay: 'wrong' }),
+    ).toThrow('When debounce is true, debounceDelay needs to be a Number.');
   });
 
   it('should throw error when initializing with invalid listenTo param', async () => {
@@ -106,10 +105,10 @@ describe('Event', () => {
     const TestEvent = new Event({ name: 'testEvent', manager: {}, debounce: true });
 
     expect(TestEvent._callRedux('test')).toEqual('test');
-    expect(mockedDebounce).toHaveBeenCalledWith(expect.any(Function), TestEvent.debounceDuration);
+    expect(mockedDebounce).toHaveBeenCalledWith(expect.any(Function), TestEvent.debounceDelay);
   });
 
-  it('debounced _callRedux should use passed debounceDuration if debouce is true', async () => {
+  it('debounced _callRedux should use passed debounceDelay if debouce is true', async () => {
     const mockedDebounce = jest.fn(() => data => data);
     __RewireAPI__.__Rewire__('_debounce', mockedDebounce);
 
@@ -117,7 +116,7 @@ describe('Event', () => {
       name: 'testEvent',
       manager: {},
       debounce: true,
-      debounceDuration: 200,
+      debounceDelay: 200,
     });
 
     expect(TestEvent._callRedux('test')).toEqual('test');
