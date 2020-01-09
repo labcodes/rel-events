@@ -7,8 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.HTTPEvent = exports.Event = void 0;
 
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
@@ -16,6 +14,8 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
@@ -99,8 +99,7 @@ var Event = function Event() {
   this._chainEvents = function (action) {
     // eslint-disable-next-line camelcase
     var listenTo = _this.listenTo,
-        _formatToRedux = _this._formatToRedux,
-        __UNSAFE_reduxDispatch = _this.__UNSAFE_reduxDispatch;
+        _formatToRedux = _this._formatToRedux;
 
     if (listenTo.length) {
       listenTo.map(function (_ref3) {
@@ -111,7 +110,7 @@ var Event = function Event() {
 
         if (action.type === reducer) {
           setTimeout(function () {
-            return __UNSAFE_reduxDispatch(_formatToRedux(event.__UNSAFE_state));
+            return action.__UNSAFE_dispatch(_formatToRedux(event.__UNSAFE_state));
           });
         }
       });
@@ -123,13 +122,13 @@ var Event = function Event() {
   };
 
   this._formatToRedux = function (dispatchData) {
-    return {
+    return _objectSpread({
       type: _this.reducerName,
       shouldDispatch: _this.manager.shouldDispatch || function () {
         return true;
       },
       extraData: dispatchData
-    };
+    }, dispatchData);
   };
 
   this._bindDataToProps = function (props) {

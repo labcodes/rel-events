@@ -157,6 +157,7 @@ describe('Event', () => {
       extraData: {
         test: 'yes',
       },
+      test: 'yes',
       shouldDispatch: expect.any(Function),
     };
 
@@ -171,6 +172,7 @@ describe('Event', () => {
       extraData: {
         test: 'yes',
       },
+      test: 'yes',
       shouldDispatch,
     };
 
@@ -309,17 +311,16 @@ describe('Event', () => {
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
-    TestEvent.__UNSAFE_reduxDispatch = jest.fn();
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
     expect(TestEvent._formatToRedux).not.toBeCalled();
-    expect(TestEvent.__UNSAFE_reduxDispatch).not.toBeCalled();
+    expect(action.__UNSAFE_dispatch).not.toBeCalled();
 
     jest.runAllTimers();
-    expect(TestEvent.__UNSAFE_reduxDispatch).toBeCalledWith('_formatToReduxCalled');
+    expect(action.__UNSAFE_dispatch).toBeCalledWith('_formatToReduxCalled');
     expect(TestEvent._formatToRedux).toBeCalledWith('__UNSAFE_state');
   });
 });
@@ -470,17 +471,16 @@ describe('HTTPEvent', () => {
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
-    TestEvent.__UNSAFE_reduxDispatch = jest.fn();
     expect(ListenedEventReturnFunction).not.toBeCalled();
 
     TestEvent._chainEvents(action);
 
     expect(ListenedEventReturnFunction).toBeCalled();
     expect(TestEvent._formatToRedux).not.toBeCalled();
-    expect(TestEvent.__UNSAFE_reduxDispatch).not.toBeCalled();
+    expect(action.__UNSAFE_dispatch).not.toBeCalled();
 
     jest.runAllTimers();
-    expect(TestEvent.__UNSAFE_reduxDispatch).toBeCalledWith('_formatToReduxCalled');
+    expect(action.__UNSAFE_dispatch).toBeCalledWith('_formatToReduxCalled');
     expect(TestEvent._formatToRedux).toBeCalledWith('__UNSAFE_state');
   });
 
