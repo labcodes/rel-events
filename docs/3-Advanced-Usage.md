@@ -21,6 +21,52 @@ export class ExampleEventManager {
 
 ```
 
+### Debouncing Events
+
+It's not unusual to have a use case in which you don't really want to trigger the Event right away. When the user is typing some data into a text input, for example, we may want to wait for a certein amount of time so that the user has finished typing, and only then trigger the Event with the latest data.
+
+Doing that inside a component may give you some undesirable effects. First of all the Component will need to implement the debouncing itself, and more code is more windows for errors. The redux flow will be oh so slightly off from the input change as well, which may lead to rendering issues when presenting the loading spinner, for example.
+
+To deal with those cases, we provide an optional `debounce` and `debounceDelay` configurations. When instantiating the Event, you are able to do something like this:
+
+```js
+// on events.js
+import { HTTPEvent } from 'rel-events';
+import { SearchByUsernameHTTPEventManager } from './eventManagers.js';
+
+export const SearchByUsernameHTTPEvent = new HTTPEvent({
+  name: 'searchByUsername',
+  manager: new SearchByUsernameHTTPEventManager(),
+  // we set debounce as true and optionally pass a custom delay in ms
+  debounce: true,
+  debounceDelay: 500, // defaults to 300
+});
+```
+
+Then, just trigger the Event as you would before and the Event will wait for that amount of time before dispatching itself:
+
+
+```js
+// on SearchByUsernameComponent.js
+import { SearchByUsernameHTTPEvent } from './events.js';
+
+class SearchByUsernameComponent extends React.Component {
+  //...
+
+  // even though the Event will be triggered whenever something is typed,
+  // it will only be dispatched after the user stopped typing
+  // and 500ms has passed since the last edit
+  render() {
+    return <inpyt type="text" onChange={e => this.props.searchByUsername({ username: e.target.value })} />
+  };
+  // ...
+}
+
+export default LoginHTTPEvent.register({ Component: LoginComponent });
+```
+
+The debounce function is provided straight from [lodash](https://lodash.com/docs/4.17.15#debounce).
+
 ### Event Chaining - Making Events listen to Events
 
 Sometimes, we want to make an Event be triggered by the completion of another. Let's imagine that, after logging in an user, we need to go somewhere to get the user's data.
