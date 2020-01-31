@@ -11,6 +11,7 @@ module.exports = {
     'no-restricted-properties': 'off',
     'no-underscore-dangle': 'off',
     'array-callback-return': 'off',
+    'camelcase': 'off',
     'no-console': ['error', { allow: ['error'] }],
     'class-methods-use-this': 'off'
   },
