@@ -37,7 +37,8 @@ const ChooseDateRangeEvent = new Event({
   listenTo: [
     {
       event: () => Event/HTTPEvent instance,
-      triggerOn: String(depends on the event being listened: 'dispatch' for normal Events, 'dispatch'/'success'/'failure' for HTTPEvents)
+      triggerOn: String(depends on the event being listened: 'dispatch' for normal Events, 'dispatch'/'success'/'failure' for HTTPEvents),
+      autocompleteCallArgs: true,
     }
   ],
   debounce: true,

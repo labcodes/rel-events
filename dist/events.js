@@ -97,20 +97,23 @@ var Event = function Event() {
   };
 
   this._chainEvents = function (action) {
-    // eslint-disable-next-line camelcase
     var listenTo = _this.listenTo,
-        _formatToRedux = _this._formatToRedux;
+        _formatToRedux = _this._formatToRedux,
+        cachedArgs = _this.__UNSAFE_cachedArgs;
 
     if (listenTo.length) {
       listenTo.map(function (_ref3) {
         var event = _ref3.event,
-            triggerOn = _ref3.triggerOn;
+            triggerOn = _ref3.triggerOn,
+            autocompleteCallArgs = _ref3.autocompleteCallArgs;
         event = event();
         var reducer = event.reducerName ? event.reducerName : event.reducers[triggerOn];
 
         if (action.type === reducer) {
           setTimeout(function () {
-            return action.__UNSAFE_dispatch(_formatToRedux(event.__UNSAFE_state));
+            var dispatchData = autocompleteCallArgs ? _objectSpread({}, cachedArgs, {}, event.__UNSAFE_state) : event.__UNSAFE_state;
+
+            action.__UNSAFE_dispatch(_formatToRedux(dispatchData));
           });
         }
       });
@@ -122,6 +125,7 @@ var Event = function Event() {
   };
 
   this._formatToRedux = function (dispatchData) {
+    _this.__UNSAFE_cachedArgs = dispatchData;
     return _objectSpread({
       type: _this.reducerName,
       shouldDispatch: _this.manager.shouldDispatch || function () {
@@ -217,6 +221,7 @@ function (_Event) {
     }, rest)));
 
     _this2._formatToRedux = function (dispatchData) {
+      _this2.__UNSAFE_cachedArgs = dispatchData;
       var shouldDispatch = _this2.manager.shouldDispatch;
       return {
         types: _this2.reducers,

@@ -161,7 +161,10 @@ describe('Event', () => {
       shouldDispatch: expect.any(Function),
     };
 
+    expect(TestEvent.__UNSAFE_cachedArgs).toBeUndefined();
     let returnedValue = TestEvent._formatToRedux({ test: 'yes' });
+    expect(TestEvent.__UNSAFE_cachedArgs).toEqual({ test: 'yes' });
+
     expect(returnedValue).toEqual(expectedReturn);
     expect(returnedValue.shouldDispatch()).toEqual(true);
 
@@ -302,12 +305,13 @@ describe('Event', () => {
     jest.useFakeTimers();
     const ListenedEventReturnFunction = jest.fn(() => ({
       reducerName: 'LISTENED_EVENT',
-      __UNSAFE_state: '__UNSAFE_state',
+      __UNSAFE_state: { data: 'here' },
     }));
     const TestEvent = new Event({
       name: 'testEvent',
       manager: {},
       listenTo: [{ event: ListenedEventReturnFunction, triggerOn: 'onDispatch' }],
+      __UNSAFE_callArgs: { test: 'data' },
     });
     const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
     TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
@@ -321,7 +325,40 @@ describe('Event', () => {
 
     jest.runAllTimers();
     expect(action.__UNSAFE_dispatch).toBeCalledWith('_formatToReduxCalled');
-    expect(TestEvent._formatToRedux).toBeCalledWith('__UNSAFE_state');
+    expect(TestEvent._formatToRedux).toBeCalledWith({ data: 'here' });
+  });
+
+  it('_chainEvents iterates listenTo array and calls with cached args', async () => {
+    jest.useFakeTimers();
+    const ListenedEventReturnFunction = jest.fn(() => ({
+      reducerName: 'LISTENED_EVENT',
+      __UNSAFE_state: { data: 'here' },
+    }));
+    const TestEvent = new Event({
+      name: 'testEvent',
+      manager: {},
+      listenTo: [
+        {
+          event: ListenedEventReturnFunction,
+          triggerOn: 'onDispatch',
+          autocompleteCallArgs: true,
+        },
+      ],
+    });
+    TestEvent.__UNSAFE_cachedArgs = { test: 'data', data: 'there' };
+    const action = { type: 'LISTENED_EVENT', __UNSAFE_dispatch: jest.fn() };
+    TestEvent._formatToRedux = jest.fn(() => '_formatToReduxCalled');
+    expect(ListenedEventReturnFunction).not.toBeCalled();
+
+    TestEvent._chainEvents(action);
+
+    expect(ListenedEventReturnFunction).toBeCalled();
+    expect(TestEvent._formatToRedux).not.toBeCalled();
+    expect(action.__UNSAFE_dispatch).not.toBeCalled();
+
+    jest.runAllTimers();
+    expect(action.__UNSAFE_dispatch).toBeCalledWith('_formatToReduxCalled');
+    expect(TestEvent._formatToRedux).toBeCalledWith({ data: 'here', test: 'data' });
   });
 });
 
@@ -368,7 +405,10 @@ describe('HTTPEvent', () => {
       shouldDispatch: expect.any(Function),
     };
 
+    expect(TestEvent.__UNSAFE_cachedArgs).toBeUndefined();
     let _formatToReduxReturn = TestEvent._formatToRedux({ test: 'data' });
+    expect(TestEvent.__UNSAFE_cachedArgs).toEqual({ test: 'data' });
+
     expect(_formatToReduxReturn).toEqual(expectedReturn);
     expect(_formatToReduxReturn.shouldDispatch()).toBeTruthy();
 

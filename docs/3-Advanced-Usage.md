@@ -67,39 +67,6 @@ export default LoginHTTPEvent.register({ Component: LoginComponent });
 
 The debounce function is provided straight from [lodash](https://lodash.com/docs/4.17.15#debounce).
 
-### Event Chaining - Making Events listen to Events
-
-Sometimes, we want to make an Event be triggered by the completion of another. Let's imagine that, after logging in an user, we need to go somewhere to get the user's data.
-
-Assuming you've implemented the `LoginHTTPEvent` as the example above, you'll need to implement your new Event and EventManager to fetch the user's data. After implementing, you just need to pass the `listenTo` key to your new event.
-
-```js
-// on events.js
-import { HTTPEvent } from 'rel-events';
-import { LoginHTTPEventManager, FetchUserDataHTTPEventManager } from './eventManagers.js';
-
-export const LoginHTTPEvent = new HTTPEvent({
-  name: 'login',
-  manager: new LoginHTTPEventManager(),
-});
-
-// to chain an event to another, declare the `listenTo` key.
-// and, yes, you may make an event listen to multiple events.
-// be careful not to pass the direct reference to LoginHTTPEvent;
-// pass a function that returns it instead.
-export const FetchUserDataHTTPEvent = new HTTPEvent({
-  name: 'fetchUserData',
-  manager: new FetchUserDataHTTPEventManager(),
-  listenTo: [
-    { event: () => LoginHTTPEvent, triggerOn: 'success' },
-  ]
-});
-```
-
-That means that, whenever the login is successful, `fetchUserData` will be triggered by calling `FetchUserDataHTTPEventManager.call` passing the data from the `LoginHTTPEvent.onSuccess` return.
-
-**One caveat** is that the `event` value is **not** a direct reference to the Event that will be listened to. Instead, it's a function that returns the reference. That's needed because we could be using multiple files for multiple Events, and, if we do, we can't guarantee that `FetchUserDataHTTPEvent` will be loaded into memory before `LoginHTTPEvent`. If that happened, the `event` value would be `undefined`, so we chose to receive a function instead.
-
 ### `useDataFrom` optional Event parameter
 
 If you want, for example, to clear data from an Event, you'll notice there isn't a way inside the same Event to do so. Instead, you must create a new Event that writes data to the first Event's state.
