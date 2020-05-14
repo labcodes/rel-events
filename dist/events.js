@@ -9,17 +9,21 @@ exports.HTTPEvent = exports.Event = void 0;
 
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _reactRedux = require("react-redux");
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = (0, _getPrototypeOf2.default)(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2.default)(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2.default)(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -111,7 +115,7 @@ var Event = function Event() {
 
         if (action.type === reducer) {
           setTimeout(function () {
-            var dispatchData = autocompleteCallArgs ? _objectSpread({}, cachedArgs, {}, event.__UNSAFE_state) : event.__UNSAFE_state;
+            var dispatchData = autocompleteCallArgs ? _objectSpread(_objectSpread({}, cachedArgs), event.__UNSAFE_state) : event.__UNSAFE_state;
 
             action.__UNSAFE_dispatch(_formatToRedux(dispatchData));
           });
@@ -203,10 +207,10 @@ var Event = function Event() {
 
 exports.Event = Event;
 
-var HTTPEvent =
-/*#__PURE__*/
-function (_Event) {
+var HTTPEvent = /*#__PURE__*/function (_Event) {
   (0, _inherits2.default)(HTTPEvent, _Event);
+
+  var _super = _createSuper(HTTPEvent);
 
   function HTTPEvent() {
     var _this2;
@@ -216,9 +220,9 @@ function (_Event) {
         rest = (0, _objectWithoutProperties2.default)(_ref4, ["name"]);
 
     (0, _classCallCheck2.default)(this, HTTPEvent);
-    _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(HTTPEvent).call(this, _objectSpread({
+    _this2 = _super.call(this, _objectSpread({
       name: name
-    }, rest)));
+    }, rest));
 
     _this2._formatToRedux = function (dispatchData) {
       _this2.__UNSAFE_cachedArgs = dispatchData;
