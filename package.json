@@ -1,6 +1,6 @@
 {
   "name": "rel-events",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "The relevant React Events Library. Events framework based on redux to decouple our from business logic and make state management easy.",
   "main": "index.js",
   "scripts": {
