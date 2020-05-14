@@ -96,6 +96,8 @@ var Event = function Event() {
         return newState;
       }
 
+      _this._chainEvents(action);
+
       return state;
     };
   };

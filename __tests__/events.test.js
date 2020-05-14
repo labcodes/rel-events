@@ -196,12 +196,12 @@ describe('Event', () => {
     expect(reducers).toHaveProperty('testEvent');
     expect(typeof reducers.testEvent).toBe('function');
 
+    expect(TestEvent._chainEvents).not.toBeCalled();
     expect(reducers.testEvent(undefined, { type: 'notThisOne' })).toEqual(
       EventManager.initialState,
     );
     expect(EventManager.onDispatch).not.toBeCalled();
 
-    expect(TestEvent._chainEvents).not.toBeCalled();
     expect(reducers.testEvent({}, { type: 'TEST_EVENT' })).toEqual({ test: 'it works!' });
     expect(EventManager.onDispatch).toBeCalled();
     expect(TestEvent._chainEvents).toBeCalledWith({ type: 'TEST_EVENT' });
@@ -225,12 +225,12 @@ describe('Event', () => {
     expect(reducers.testEvent).toBeUndefined();
     expect(typeof reducers.otherEvent).toBe('function');
 
+    expect(TestEvent._chainEvents).not.toBeCalled();
     expect(reducers.otherEvent(undefined, { type: 'notThisOne' })).toEqual(
       EventManager.initialState,
     );
     expect(EventManager.onDispatch).not.toBeCalled();
 
-    expect(TestEvent._chainEvents).not.toBeCalled();
     expect(reducers.otherEvent({}, { type: 'TEST_EVENT' })).toEqual({ test: 'it works!' });
     expect(EventManager.onDispatch).toBeCalled();
     expect(TestEvent._chainEvents).toBeCalledWith({ type: 'TEST_EVENT' });
