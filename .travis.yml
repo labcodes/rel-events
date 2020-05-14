@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "current"
+  - "lts/*"
 script:
   - npm run test
 before_script:
