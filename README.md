@@ -175,3 +175,5 @@ Thanks for wanting to contribute! Please, read our [Contributing guide](https://
 ### Thanks
 
 Thanks for everyone at Labcodes for giving me the structure and time for me to work on this pet project of mine and giving me lots of awesome feedback! Bernardo Fontes, Luan Fonseca, Thulio Philipe, Mariana Bedran, Breno Chamie and Renato Oliveira, I'm really, really grateful for your input! <3
+
+![labcodes github banner](labcodes-github-banner.jpg)
